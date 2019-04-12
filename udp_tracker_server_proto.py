@@ -8,14 +8,13 @@ from random import randint, sample
 class UdpTrackerServerProto(asyncio.Protocol):
     def __init__(self, server):
         self.server = server
-        self.logger = server.logger
         self.connection_lost_received = asyncio.Event()
         self.transport = None
 
     def error(self, tid, msg):
         return struct.pack('!II', 3, tid) + msg
 
-    def process_connect(self, addr, connid, tid, data):
+    def process_connect(self, addr, connid, tid):
         self.server.logger.info('Received connect message.')
         if connid == 0x41727101980:
             connid = randint(0, 0xffffffffffffffff)
@@ -27,55 +26,32 @@ class UdpTrackerServerProto(asyncio.Protocol):
 
     def process_announce(self, addr, connid, tid, data):
         self.server.logger.info('Received announce message.')
+        fmt = '!20s20sIIIIH'
+        size = struct.calcsize(fmt)
 
-        # remove extensions
-        if len(data) > 82:
-            data = data[:82]
-
-        # parse the request
-        ih, peerid, dl, left, ul, ev, ip, k, num_want, port = struct.unpack('!20s20sQQQIIIIH', data)
-
-        # use the ip address in the message if it's provided
-        if ip == 0:
-            ip = addr[0]
+        if len(data) > size:
+            data = data[:size]
+        ih, peerid, ev, ip, k, num_want, port = struct.unpack(fmt, data)
 
         # make sure the provided connection identifier is valid
         timestamp = self.server.connids.get(connid, None)
         last_valid = datetime.now() - timedelta(seconds=self.server.connid_valid_period)
         if not timestamp:
-            # we didn't generate that connection identifier
             return self.error(tid, 'Invalid connection identifier.'.encode('utf-8'))
         elif timestamp < last_valid:
-            # we did generate that identifier, but it's too
-            # old. remove it and send an error.
             del self.server.connids[connid]
             return self.error(tid, 'Old connection identifier.'.encode('utf-8'))
         else:
             self.server.activity[connid] = datetime.now()
 
             # send the event to the tracker
-            self.server.announce(ih, peerid, dl, left, ul, ev, ip, port)
-
-            # get all peers for this torrent
-            all_peers = self.server.torrents.get(ih, {}).values()
-
-            # count all peers that have announced "completed". these
-            # are the seeders. the rest are leechers.
-            seeders = sum(1 for _, _, _, _, _, completed in all_peers
-                          if completed)
-            leechers = len(all_peers) - seeders
-
-            # we're not interested in anything but (ip, port) pairs
-            # anymore
-            all_peers = [(ip, port) for ip, port, dl, left, ul, c in all_peers]
-
-            # remove this peer from the list
-            all_peers = [i for i in all_peers if i != addr]
+            self.server.announce(ih, peerid, ev, ip, port)
+            self.server.logger.info('{}, {}'.format(ip, port))
+            self.server.logger.info(self.server.torrents.get(ih, {}).values())
+            all_peers = [i for i in self.server.torrents.get(ih, {}).values() if i != (ip, port)]
 
             # we can't give more peers than we've got
             num_want = min(num_want, len(all_peers))
-
-            # get a random sample from the peers
             peers = sample(all_peers, num_want)
 
             # now pack the (ip, port) pairs
@@ -84,9 +60,7 @@ class UdpTrackerServerProto(asyncio.Protocol):
                 for p in peers)
 
             # construct and return the response
-            return struct.pack(
-                '!IIII',
-                1, tid, leechers, seeders) + peers
+            return struct.pack('!II', 1, tid) + peers
 
     def connection_made(self, transport):
         self.transport = transport
@@ -96,18 +70,16 @@ class UdpTrackerServerProto(asyncio.Protocol):
 
     def datagram_received(self, data, addr):
         if len(data) < 16:
-            self.logger.warning('Datagram smaller than 16 bytes.')
+            self.server.logger.warning('Datagram smaller than 16 bytes.')
             return
 
         connid, action, tid = struct.unpack('!QII', data[:16])
-        resp = {
-            0: self.process_connect,
-            1: self.process_announce
-        }.get(action, lambda a, c, t, d: None)(addr, connid,
-                                               tid, data[16:])
-
-        if resp:
+        if action == 0:
+            resp = self.process_connect(addr, connid, tid)
+            self.transport.sendto(resp, addr)
+        elif action == 1:
+            resp = self.process_announce(addr, connid, tid, data[16:])
             self.transport.sendto(resp, addr)
 
     def error_received(self, exc):
-        self.logger.info('Error received:'.format(exc))
+        self.server.logger.info('Error received:'.format(exc))

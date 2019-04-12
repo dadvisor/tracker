@@ -41,36 +41,18 @@ class TrackerServer:
         await self.proto.connection_lost_received.wait()
         self.logger.info('Tracker stopped.')
 
-    def announce(self, ih, peerid, dl, left, ul, ev, ip, port):
-        if ev not in [0, 1, 2, 3]:
-            self.logger.warning('Invalid event in announce.')
-            return
-
+    def announce(self, ih, peerid, ev, ip, port):
         if ih not in self.torrents:
             self.logger.info('New info hash encountered: {}'.format(ih.hex()))
             self.torrents[ih] = {}
-            self.torrents[ih][peerid] = (ip, port, 0, 0, 0, (ev == 1))
+            self.torrents[ih][peerid] = (ip, port)
         if ih in self.torrents and peerid not in self.torrents[ih]:
             self.logger.debug('New peer encountered: {}'.format(peerid.hex()))
-            self.torrents[ih][peerid] = (ip, port, 0, 0, 0, (ev == 1))
-
+            self.torrents[ih][peerid] = (ip, port)
         if ev == 0:
             # none
             self.logger.info('Regular announce from: {}'.format(peerid.hex()))
-
-            _ip, _port, _dl, _left, _ul, _completed = self.torrents[ih][peerid]
-            if _ip != ip or _port != port:
-                self.logger.info('Peer "{}" announcing from new address {}:{}'
-                                 .format(peerid.hex(), ip, port))
-            self.torrents[ih][peerid] = (ip, port, dl, left, ul, _completed)
-        elif ev == 1:
-            # completed
-            self.logger.info('Completion announce from: {}'.format(peerid.hex()))
-            self.torrents[ih][peerid] = (ip, port, dl, left, ul, True)
-        elif ev == 2:
-            # started
-            self.logger.info('Start announce from: {}'.format(peerid.hex()))
-            self.torrents[ih][peerid] = (ip, port, dl, left, ul, True)
+            self.torrents[ih][peerid] = (ip, port)
         elif ev == 3:
             # stopped
             self.logger.info('Stop announce from: {}. Removed peer.'.format(peerid.hex()))
