@@ -46,8 +46,6 @@ class UdpTrackerServerProto(asyncio.Protocol):
 
             # send the event to the tracker
             self.server.announce(ih, peerid, ev, ip, port)
-            self.server.logger.info('{}, {}'.format(ip, port))
-            self.server.logger.info(self.server.torrents.get(ih, {}).values())
             all_peers = [i for i in self.server.torrents.get(ih, {}).values() if i != (ip, port)]
 
             # we can't give more peers than we've got
