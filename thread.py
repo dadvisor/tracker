@@ -1,5 +1,6 @@
 import threading
 import time
+from ipaddress import ip_address
 
 import requests
 
@@ -32,6 +33,7 @@ class ActiveThread(threading.Thread):
         for infohash, data in list(self.server.torrents.items()):
             for peerid, (ip, port) in list(data.items()):
                 try:
+                    ip = str(ip_address(ip))
                     requests.get('http://{}:{}/ip'.format(ip, port)).text()
                 except Exception:
                     self.server.logger.info('Removing address: {}:{}'.format(ip, port))
