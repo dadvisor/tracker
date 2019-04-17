@@ -3,10 +3,12 @@ import ast
 from aiohttp import web
 
 from tracker import RedBlackTree
+from random import sample
+
+MAX_PEERS = 10
 
 
 def get_app(tree_dict, loop):
-
     def get_tree(hash) -> RedBlackTree:
         if hash not in tree_dict:
             tree_dict[hash] = RedBlackTree()
@@ -21,6 +23,12 @@ def get_app(tree_dict, loop):
             if node:
                 return web.json_response(node.children())
         return web.json_response({'Error': 'Value not found in tree'})
+
+    async def peers(request):
+        tree = get_tree(request.match_info['hash'])
+        values = list(tree)
+        size = min(len(values), MAX_PEERS)
+        return web.json_response(sample(values, size))
 
     async def dashboard(request):
         tree = get_tree(request.match_info['hash'])
@@ -42,5 +50,6 @@ def get_app(tree_dict, loop):
     app = web.Application(loop=loop)
     app.add_routes([web.get('/dashboard/{hash}', dashboard),
                     web.get('/add/{hash}', add_node),
-                    web.get('/children/{hash}', children)])
+                    web.get('/children/{hash}', children),
+                    web.get('/peers/{hash}', peers)])
     return app
