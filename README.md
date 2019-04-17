@@ -8,9 +8,9 @@ First install the requirements with:
 
 Then start with:
 
-	python server.py
+	python main.py
 
 ## Run using docker
 Or use the following docker command:
 
-	docker run --name tracker -d -p 6969:6969/udp dadvisor/tracker:latest
+	docker run --name tracker -d -p 8080:8080 dadvisor/tracker:latest

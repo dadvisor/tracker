@@ -6,4 +6,4 @@ COPY . /app
 RUN pip install -r requirements.txt
 
 
-CMD ["python", "server.py"]
+CMD ["python", "main.py"]
