@@ -3,9 +3,6 @@ import ast
 from aiohttp import web
 
 from tracker import RedBlackTree
-from random import sample
-
-MAX_PEERS = 10
 
 
 def get_app(tree_dict, loop):
@@ -26,9 +23,7 @@ def get_app(tree_dict, loop):
 
     async def peers(request):
         tree = get_tree(request.match_info['hash'])
-        values = list(tree)
-        size = min(len(values), MAX_PEERS)
-        return web.json_response(sample(values, size))
+        return web.json_response(list(tree))
 
     async def dashboard(request):
         tree = get_tree(request.match_info['hash'])
@@ -40,16 +35,14 @@ def get_app(tree_dict, loop):
 
     async def add_node(request):
         tree = get_tree(request.match_info['hash'])
-        value = request.rel_url.query.get('value', None)
-        if value:
-            value = ast.literal_eval(value)
-            tree.add(value)
-            return web.json_response({'value': value})
-        return web.json_response({'Error': 'Value not given'})
+        value = request.match_info['value']
+        host, port = value.split(':')
+        tree.add((host, port))
+        return web.json_response({'value': (host, port)})
 
     app = web.Application(loop=loop)
     app.add_routes([web.get('/dashboard/{hash}', dashboard),
-                    web.get('/add/{hash}', add_node),
+                    web.get('/add/{hash}/{peer}', add_node),
                     web.get('/children/{hash}', children),
                     web.get('/peers/{hash}', peers)])
     return app
