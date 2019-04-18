@@ -35,8 +35,8 @@ def get_app(tree_dict, loop):
 
     async def add_node(request):
         tree = get_tree(request.match_info['hash'])
-        value = request.match_info['value']
-        host, port = value.split(':')
+        peer = request.match_info['peer']
+        host, port = peer.split(':')
         tree.add((host, port))
         return web.json_response({'value': (host, port)})
 
