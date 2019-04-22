@@ -30,7 +30,7 @@ def get_app(tree_dict, loop):
         node = tree.root
         if node:
             value = node.value
-            return web.HTTPFound('http://{}:{}/dashboard'.format(value[0], value[1]))
+            return web.HTTPFound('http://{}:{}/dadvisor/dashboard'.format(value[0], value[1]))
         return web.json_response({'Error': 'Tree has no root'})
 
     async def add_node(request):

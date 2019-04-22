@@ -23,5 +23,5 @@ async def iterate_tree(tree_dict):
 
 async def check_alive(address, port):
     async with aiohttp.ClientSession() as session:
-        async with session.get('http://{}:{}/ip'.format(address, port)) as resp:
+        async with session.get('http://{}:{}/dadvisor/ip'.format(address, port)) as resp:
             return await resp.json()
