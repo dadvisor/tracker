@@ -13,7 +13,7 @@ def run_forever():
     loop = asyncio.new_event_loop()
     app = get_app(tree_dict, loop)
 
-    loop.create_task(validate(tree_dict))
+    # loop.create_task(validate(tree_dict))
     loop.create_task(run_app(app))
     try:
         print('Running forever')
