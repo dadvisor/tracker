@@ -27,5 +27,6 @@ def run_forever():
 async def run_app(app):
     runner = web.AppRunner(app)
     await runner.setup()
-    site = web.TCPSite(runner, '0.0.0.0', 8080)
+    port = int(os.environ.get('PORT', 14100))
+    site = web.TCPSite(runner, '0.0.0.0', port)
     await site.start()
