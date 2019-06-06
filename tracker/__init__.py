@@ -5,7 +5,6 @@ from aiohttp import web
 
 from tracker.bst import RedBlackTree
 from tracker.service import get_app
-from tracker.validate import validate
 
 
 def run_forever():
@@ -13,9 +12,6 @@ def run_forever():
 
     loop = asyncio.new_event_loop()
     app = get_app(tree_dict, loop)
-
-    if os.environ.get('LIFE_CHECK', '0') == '1':
-        loop.create_task(validate(tree_dict))
     loop.create_task(run_app(app))
     try:
         loop.run_forever()

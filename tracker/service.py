@@ -1,5 +1,3 @@
-import ast
-
 from aiohttp import web
 
 from tracker import RedBlackTree
@@ -34,6 +32,15 @@ def get_app(tree_dict, loop):
         tree.add((host, port))
         return web.json_response({'value': (host, port)})
 
+    async def remove_node(request):
+        """ Add a value to the tree.
+        Example: /remove/<hash>/ip:port"""
+        tree = get_tree(request.match_info['hash'])
+        peer = request.match_info['peer']
+        host, port = peer.split(':')
+        tree.remove((host, port))
+        return web.json_response({'value': (host, port)})
+
     async def node_info(request):
         """ Returns the children of a given value.
         Example: /node_info/<hash>/<ip>:<port>"""
@@ -50,6 +57,7 @@ def get_app(tree_dict, loop):
     app = web.Application(loop=loop)
     app.add_routes([web.get('/dashboard/{hash}', dashboard),
                     web.get('/add/{hash}/{peer}', add_node),
+                    web.get('/remove/{hash}/{peer}', remove_node),
                     web.get('/peers/{hash}', peers),
                     web.get('/node_info/{hash}/{peer}', node_info)])
     return app
