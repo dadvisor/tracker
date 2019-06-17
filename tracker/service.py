@@ -8,29 +8,29 @@ from aiohttp import web
 def get_app(loop):
     peer_dict = {}  # dict of lists
 
-    def get_list(hash) -> []:
+    def get_set(hash) -> []:
         if hash not in peer_dict:
-            peer_dict[hash] = []
-        return peer_dict[hash]
+            peer_dict[hash] = set()
+        return list(peer_dict[hash])
 
     async def get_peers(request):
         """ Returns a list of peers """
-        return web.json_response(get_list(request.match_info['hash']))
+        return web.json_response(get_set(request.match_info['hash']))
 
     async def add_node(request):
         """ Add a value to the tree.
         Example: /add/<hash>/ip:port"""
-        peers = get_list(request.match_info['hash'])
+        peers = get_set(request.match_info['hash'])
         peer = request.match_info['peer']
         host, port = peer.split(':')
-        peers.append((host, port))
+        peers.add((host, port))
         loop.create_task(send_list_to_peers(peers))
         return web.json_response({'value': (host, port)})
 
     async def remove_node(request):
         """ Add a value to the tree.
         Example: /remove/<hash>/ip:port"""
-        peers = get_list(request.match_info['hash'])
+        peers = get_set(request.match_info['hash'])
         peer = request.match_info['peer']
         host, port = peer.split(':')
         peers.remove((host, port))
