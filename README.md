@@ -20,8 +20,10 @@ Or use the following docker command:
 This tracker contains the following endpoints. Note that `{hash}` can be replaced with any string.
 Additionally, `{peer}` is structured as `ip:port`:
 
-- `/dashboard/{hash}`: for redirecting to the dashboard.
 - `/add/{hash}/{peer}`: for adding a peer.
 - `/remove/{hash}/{peer}`: for removing a peer.
 - `/peers/{hash}`: for retrieving a list of peers.
-- `/node_info/{hash}/{peer}`: for info about a node in the tree.
+
+## Testing
+run the following file for testing purposes
+`python -m unittest tracker.TestService`

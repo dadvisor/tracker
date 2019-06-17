@@ -23,7 +23,7 @@ def get_app(loop):
         peers = get_list(request.match_info['hash'])
         peer = request.match_info['peer']
         host, port = peer.split(':')
-        peers.add((host, port))
+        peers.append((host, port))
         loop.create_task(send_list_to_peers(peers))
         return web.json_response({'value': (host, port)})
 
@@ -48,7 +48,7 @@ def get_app(loop):
                     data={'peers': peers_list}))
             await asyncio.gather(*post_tasks)
 
-    app = web.Application(loop=loop)
+    app = web.Application()
     app.add_routes([web.get('/add/{hash}/{peer}', add_node),
                     web.get('/remove/{hash}/{peer}', remove_node),
                     web.get('/peers/{hash}', get_peers)])

@@ -4,6 +4,7 @@ import os
 from aiohttp import web
 
 from tracker.service import get_app
+from tracker.tests import TestService
 
 
 def run_forever():
