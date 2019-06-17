@@ -41,6 +41,7 @@ def get_app(loop):
 
     async def send_list_to_peers(peers_list):
         """ Update the peers with the new list """
+        print('Sending peers list: {}'.format(peers_list))
         async with aiohttp.ClientSession() as session:
             post_tasks = []
             for peer in peers_list:
