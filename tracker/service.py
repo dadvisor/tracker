@@ -44,7 +44,7 @@ def get_app(loop):
             for peer in peers_list:
                 host, port = peer
                 post_tasks.append(session.post(
-                    'http://{}:{}/dadvisor/set_peers/'.format(host, port),
+                    'http://{}:{}/dadvisor/set_peers'.format(host, port),
                     data={'peers': peers_list}))
             await asyncio.gather(*post_tasks)
 
