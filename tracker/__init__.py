@@ -3,15 +3,12 @@ import os
 
 from aiohttp import web
 
-from tracker.bst import RedBlackTree
 from tracker.service import get_app
 
 
 def run_forever():
-    tree_dict = {}
-
     loop = asyncio.new_event_loop()
-    app = get_app(tree_dict, loop)
+    app = get_app(loop)
     loop.create_task(run_app(app))
     try:
         loop.run_forever()
