@@ -11,11 +11,11 @@ def get_app(loop):
     def get_set(hash) -> []:
         if hash not in peer_dict:
             peer_dict[hash] = set()
-        return list(peer_dict[hash])
+        return peer_dict[hash]
 
     async def get_peers(request):
         """ Returns a list of peers """
-        return web.json_response(get_set(request.match_info['hash']))
+        return web.json_response(list(get_set(request.match_info['hash'])))
 
     async def add_node(request):
         """ Add a value to the tree.
@@ -23,8 +23,9 @@ def get_app(loop):
         peers = get_set(request.match_info['hash'])
         peer = request.match_info['peer']
         host, port = peer.split(':')
-        peers.add((host, port))
-        loop.create_task(send_list_to_peers(peers))
+        if not (host, port) in peers:
+            peers.add((host, port))
+            loop.create_task(send_list_to_peers(list(peers)))
         return web.json_response({'value': (host, port)})
 
     async def remove_node(request):
@@ -33,8 +34,9 @@ def get_app(loop):
         peers = get_set(request.match_info['hash'])
         peer = request.match_info['peer']
         host, port = peer.split(':')
-        peers.remove((host, port))
-        loop.create_task(send_list_to_peers(peers))
+        if (host, port) in peers:
+            peers.remove((host, port))
+            loop.create_task(send_list_to_peers(list(peers)))
         return web.json_response({'value': (host, port)})
 
     async def send_list_to_peers(peers_list):
