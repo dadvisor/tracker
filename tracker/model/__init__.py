@@ -1,23 +1,23 @@
-from tracker.database.node import Node
+from tracker.model.node import Node
 
 
 class Database(object):
     """
-    The database consists of a list of Node-objects.
+    The model consists of a list of Node-objects.
     """
 
     def __init__(self):
         self.node_list = []
 
-    def add(self, node):
-        if node not in self.node_list:
-            self.node_list.append(node)
+    def add(self, item):
+        if item not in self.node_list:
+            self.node_list.append(item)
             return True
         return False
 
-    def remove(self, node):
-        if node in self.node_list:
-            self.node_list.remove(node)
+    def remove(self, item):
+        if item in self.node_list:
+            self.node_list.remove(item)
             return True
         return False
 
@@ -26,8 +26,8 @@ class Database(object):
         Divides the nodes over the super nodes.
         :return: A list with tuples with (super_node, list of nodes)
         """
-        nodes = [node for node in self.node_list if not node.is_super_node]
-        super_nodes = [node for node in self.node_list if node.is_super_node]
+        nodes = [item for item in self.node_list if not item.is_super_node]
+        super_nodes = [item for item in self.node_list if item.is_super_node]
 
         chunks = self.make_chunks(nodes, len(super_nodes))
         return [(super_nodes[i], node_list) for i, node_list in enumerate(chunks)]

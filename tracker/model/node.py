@@ -16,9 +16,6 @@ class Node(object):
         return f'Node({self.ip}, {self.port}, {self.is_super_node})'
 
     def __dict__(self):
-        return self.to_json()
-
-    def to_json(self):
         return {'node': {
             'ip': self.ip,
             'port': self.port,

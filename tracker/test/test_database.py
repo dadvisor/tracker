@@ -1,7 +1,7 @@
 import unittest
 
 from tracker import Database
-from tracker.database.node import Node
+from tracker.model.node import Node
 from math import floor, ceil
 
 
@@ -16,7 +16,6 @@ class TestDatabase(unittest.TestCase):
         assert self.database.node_list == [node]
 
     def test_add_unique(self):
-        key = 'abc'
         node = Node('ip', 124, True)
         node2 = Node('ip', 124, True)
         self.database.add(node)

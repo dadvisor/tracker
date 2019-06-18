@@ -1,6 +1,6 @@
 from json import JSONEncoder
 
-from tracker.database import Node
+from tracker.model import Node
 
 
 class JSONCustomEncoder(JSONEncoder):
