@@ -30,13 +30,10 @@ class Database(object):
         super_nodes = [node for node in self.node_list if node.is_super_node]
 
         chunks = self.make_chunks(nodes, len(super_nodes))
-        return [(super_nodes[i].to_json(), [n.to_json() for n in node_list])
-                for i, node_list in enumerate(chunks)]
+        return [(super_nodes[i], node_list) for i, node_list in enumerate(chunks)]
 
     @staticmethod
     def make_chunks(seq, num):
-        if num == 0:
-            return []
         avg = len(seq) / float(num)
         out = []
         last = 0.0

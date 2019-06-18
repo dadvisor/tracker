@@ -4,7 +4,7 @@ import json
 import aiohttp
 
 from tracker.database import Node
-
+from tracker.encoder import JSONCustomEncoder
 
 FILENAME = '/prometheus.json'
 
@@ -23,7 +23,7 @@ async def request_to_node(request):
     """ Helper function to retrun a Node-object from the json data in the POST request"""
     data = json.loads(await request.json())
     node = data.get('node')
-    return Node(node.get('ip'), node.get('port'), node.get('is_super_node'))
+    return Node(node.get('ip'), int(node.get('port')), node.get('is_super_node'))
 
 
 async def check_remove(database, node):
@@ -44,14 +44,14 @@ def send_distribution(loop, distribution):
         ip = super_node['node']['ip']
         port = super_node['node']['port']
         loop.create_task(send_post(
-            f'http://{ip}:{port}/dadvisor/set_peers',
+            f'http://{ip}:{port}/dadvisor/set_nodes',
             {'nodes': nodes}))
 
 
 async def send_post(url, data):
     try:
         async with aiohttp.ClientSession() as session:
-            await session.post(url, json=json.dumps(data))
+            await session.post(url, json=json.dumps(data, cls=JSONCustomEncoder),)
         return True
     except Exception as e:
         print(e)
