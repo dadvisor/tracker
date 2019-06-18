@@ -23,13 +23,16 @@ async def request_to_node(request):
     return Node(node.get('ip'), node.get('port'), node.get('is_super_node'))
 
 
-async def check_remove(database, key, node):
+async def check_remove(database, node):
+    """
+    Verify whether the node cannot be reached
+    """
     for i in range(10):
         await asyncio.sleep(6)
         if await send_get(f'http://{node.ip}:{node.port}/dadvisor/get_info'):
             return
-    database.remove(key, node)
-    print(f'Removed {node} from {key}')
+    database.remove(node)
+    print(f'Removed {node}')
 
 
 def send_distribution(loop, distribution):

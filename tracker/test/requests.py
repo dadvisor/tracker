@@ -1,3 +1,9 @@
+"""
+
+    This is a debug file and does not contain any tests
+
+"""
+
 import asyncio
 import json
 
@@ -8,14 +14,14 @@ from tracker.database import Node
 
 async def send_post_add(node):
     async with aiohttp.ClientSession() as session:
-        async with session.post('http://localhost:14100/add/hash',
+        async with session.post('http://localhost:14100/root/add',
                                 json=json.dumps(node.to_json())) as resp:
             print(await resp.text())
 
 
 async def send_post_remove(node):
     async with aiohttp.ClientSession() as session:
-        async with session.post('http://localhost:14100/remove/hash',
+        async with session.post('http://localhost:14100/root/remove',
                                 json=json.dumps(node.to_json())) as resp:
             print(await resp.text())
 
