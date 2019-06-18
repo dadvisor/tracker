@@ -81,10 +81,7 @@ def set_scrapes(nodes):
     for node in [node for node in nodes if node.is_super_node]:
         super_node_list.append(f'{node.ip}:{node.port}')
 
-    data = [{"labels": {"job": "federate"},
-             "metrics_path": "/federate",
-             "params": {"match[]": ["{job='dadvisor'}"]},
-             "targets": super_node_list}]
+    data = [{"labels": {"job": "federate"}, "targets": super_node_list}]
     new_data = json.dumps(data) + '\n'
 
     if old_data != new_data:
