@@ -28,6 +28,6 @@ async def send_post_remove(node):
 
 if __name__ == '__main__':
     loop = asyncio.new_event_loop()
-    loop.run_until_complete(send_post_add(Node('ip', 1234, True)))
+    loop.run_until_complete(send_post_add(Node('localhost', 14100, True)))
     loop.run_until_complete(send_post_add(Node('ip', 123, False)))
     loop.run_until_complete(send_post_remove(Node('ip', 123, False)))
