@@ -3,13 +3,14 @@ import os
 
 from aiohttp import web
 
+from tracker.database import Database
 from tracker.service import get_app
-from tracker.tests import TestService
+from tracker.test.test_service import TestService
 
 
 def run_forever():
     loop = asyncio.new_event_loop()
-    app = get_app(loop)
+    app = get_app(loop, Database())
     loop.create_task(run_app(app))
     try:
         loop.run_forever()

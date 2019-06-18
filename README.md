@@ -10,19 +10,12 @@ Then start with:
 
 	python main.py
 
-## Run using docker
-Or use the following docker command:
-
-	docker run --name tracker -d -p 14100:14100 dadvisor/tracker:latest
-
-
 ## Endpoints
 This tracker contains the following endpoints. Note that `{hash}` can be replaced with any string.
-Additionally, `{peer}` is structured as `ip:port`:
 
-- `/add/{hash}/{peer}`: for adding a peer.
-- `/remove/{hash}/{peer}`: for removing a peer.
-- `/peers/{hash}`: for retrieving a list of peers.
+- `/add/{hash}`: POST-request for adding a peer.
+- `/remove/{hash}`: POST-request for removing a peer.
+- `/distribution/{hash}`: GET-request for retrieving a list of peers.
 
 ## Testing
 run the following file for testing purposes

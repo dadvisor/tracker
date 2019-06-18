@@ -1,6 +1,6 @@
 from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
 
-from tracker import get_app
+from tracker import get_app, Database
 
 HASH = '1234'
 
@@ -11,7 +11,7 @@ class TestService(AioHTTPTestCase):
         """
         Override the get_app method to return your application.
         """
-        return get_app(self.loop)
+        return get_app(self.loop, Database())
 
     @unittest_run_loop
     async def test_add_node(self):
@@ -32,4 +32,3 @@ class TestService(AioHTTPTestCase):
         await self.client.get('/add/{}/{}:{}'.format(HASH, peer[0], peer[1]))
         resp = await self.client.get('/peers/{}'.format(HASH))
         assert resp.status == 200
-
