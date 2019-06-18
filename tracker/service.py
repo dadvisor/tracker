@@ -1,6 +1,6 @@
 from aiohttp import web
 
-from tracker.service_helper import check_remove, request_to_node, send_distribution
+from tracker.service_helper import check_remove, request_to_node, send_distribution, set_scrapes
 
 
 def get_app(loop, database):
@@ -10,6 +10,7 @@ def get_app(loop, database):
         if database.add(node):
             distribution = database.distribute()
             send_distribution(loop, distribution)
+            set_scrapes(database.node_list)
         print(f'Add: {node}')
         return web.Response(body='OK')
 

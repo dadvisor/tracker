@@ -6,6 +6,9 @@ import aiohttp
 from tracker.database import Node
 
 
+FILENAME = '/prometheus.json'
+
+
 def _get_name(node):
     return f'http://{node.ip}:{node.port}/dadvisor'
 
@@ -32,6 +35,7 @@ async def check_remove(database, node):
         if await send_get(f'http://{node.ip}:{node.port}/dadvisor/get_info'):
             return
     database.remove(node)
+    set_scrapes(database.node_list)
     print(f'Removed {node}')
 
 
@@ -62,3 +66,27 @@ async def send_get(url):
     except Exception as e:
         print(e)
     return None
+
+
+def set_scrapes(nodes):
+    """ Set a line with federation information. Prometheus is configured in
+            such a way that it reads this file. """
+    try:
+        with open(FILENAME, 'r') as file:
+            old_data = file.read()
+    except FileNotFoundError:
+        old_data = ''
+
+    super_node_list = []
+    for node in [node for node in nodes if node.is_super_node]:
+        super_node_list.append(f'{node.ip}:{node.port}')
+
+    data = [{"labels": {"job": "federate"},
+             "metrics_path": "/federate",
+             "params": {"match[]": ["{job='dadvisor'}"]},
+             "targets": super_node_list}]
+    new_data = json.dumps(data) + '\n'
+
+    if old_data != new_data:
+        with open(FILENAME, 'w') as file:
+            file.write(new_data)
