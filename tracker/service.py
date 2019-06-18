@@ -1,3 +1,5 @@
+import json
+
 from aiohttp import web
 
 from tracker.encoder import JSONCustomEncoder
@@ -5,7 +7,6 @@ from tracker.service_helper import check_remove, request_to_node, send_distribut
 
 
 def get_app(loop, database):
-
     async def clear(request):
         """ removes all values from the list"""
         database.node_list = []
@@ -26,14 +27,14 @@ def get_app(loop, database):
         """ Return the distribution """
         distribution = database.distribute()
         print(f'get_distribution')
-        return web.json_response({'distribution': distribution},
-                                 dumps=JSONCustomEncoder.encode)
+        return web.json_response(text=json.dumps({'distribution': distribution},
+                                                 cls=JSONCustomEncoder))
 
     async def get_list(request):
         """ Return all elements """
         print(f'get_list')
-        return web.json_response({'list': database.node_list},
-                                 dumps=JSONCustomEncoder.encode)
+        return web.json_response(text=json.dumps({'list': database.node_list},
+                                                 cls=JSONCustomEncoder))
 
     async def remove_node(request):
         """ Add a value to the tree. """
