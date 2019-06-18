@@ -5,7 +5,6 @@ from aiohttp import web
 
 from tracker.database import Database
 from tracker.service import get_app
-from tracker.test.test_service import TestService
 
 
 def run_forever():
