@@ -34,6 +34,8 @@ class Database(object):
 
     @staticmethod
     def make_chunks(seq, num):
+        if num == 0:
+            return []
         avg = len(seq) / float(num)
         out = []
         last = 0.0

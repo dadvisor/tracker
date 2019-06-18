@@ -51,7 +51,7 @@ def send_distribution(loop, distribution):
 async def send_post(url, data):
     try:
         async with aiohttp.ClientSession() as session:
-            await session.post(url, json=json.dumps(data, cls=JSONCustomEncoder),)
+            await session.post(url, json=json.dumps(data, cls=JSONCustomEncoder))
         return True
     except Exception as e:
         print(e)
