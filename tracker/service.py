@@ -31,7 +31,7 @@ def get_app(loop, database):
         return web.Response(body='OK')
 
     app = web.Application()
-    app.add_routes([web.post('/add/{hash}', add_node),
-                    web.post('/remove/{hash}', remove_node),
-                    web.get('/distribution/{hash}', get_distribution)])
+    app.add_routes([web.post('/root/add/{hash}', add_node),
+                    web.post('/root/remove/{hash}', remove_node),
+                    web.get('/root/distribution/{hash}', get_distribution)])
     return app
