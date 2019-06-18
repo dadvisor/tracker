@@ -26,7 +26,7 @@ async def request_to_node(request):
     return Node(node.get('ip'), int(node.get('port')), node.get('is_super_node'))
 
 
-async def check_remove(database, node):
+async def check_remove(loop, database, node):
     """
     Verify whether the node cannot be reached
     """
@@ -35,17 +35,16 @@ async def check_remove(database, node):
         if await send_get(f'http://{node.ip}:{node.port}/dadvisor/get_info'):
             return
     database.remove(node)
+    send_distribution(loop, database.distribute())
     set_scrapes(database.node_list)
     print(f'Removed {node}')
 
 
 def send_distribution(loop, distribution):
-    for super_node, nodes in distribution:
-        ip = super_node['node']['ip']
-        port = super_node['node']['port']
+    for super_node, node_list in distribution:
         loop.create_task(send_post(
-            f'http://{ip}:{port}/dadvisor/set_nodes',
-            {'nodes': nodes}))
+            f'http://{super_node.ip}:{super_node.port}/dadvisor/set_distribution',
+            {'nodes': node_list}))
 
 
 async def send_post(url, data):

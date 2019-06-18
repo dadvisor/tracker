@@ -17,8 +17,7 @@ def get_app(loop, database):
         """ Add a value to the list """
         node = await request_to_node(request)
         database.add(node)
-        distribution = database.distribute()
-        send_distribution(loop, distribution)
+        send_distribution(loop, database.distribute())
         set_scrapes(database.node_list)
         print(f'Added: {node}')
         return web.Response(body='OK')
@@ -39,7 +38,7 @@ def get_app(loop, database):
     async def remove_node(request):
         """ Add a value to the tree. """
         node = await request_to_node(request)
-        loop.create_task(check_remove(database, node))
+        loop.create_task(check_remove(loop, database, node))
         print(f'Removed: {node}')
         return web.Response(body='OK')
 
