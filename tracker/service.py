@@ -4,8 +4,15 @@ from tracker.service_helper import check_remove, request_to_node, send_distribut
 
 
 def get_app(loop, database):
+
+    async def clear(request):
+        """ removes all values from the list"""
+        database.node_list = []
+        print('Database emptied')
+        return web.Response(body='OK')
+
     async def add_node(request):
-        """ Add a value to the tree """
+        """ Add a value to the list """
         node = await request_to_node(request)
         if database.add(node):
             distribution = database.distribute()
@@ -30,5 +37,6 @@ def get_app(loop, database):
     app = web.Application()
     app.add_routes([web.post('/root/add', add_node),
                     web.post('/root/remove', remove_node),
-                    web.get('/root/distribution', get_distribution)])
+                    web.get('/root/distribution', get_distribution),
+                    web.get('/root/clear', clear)])
     return app

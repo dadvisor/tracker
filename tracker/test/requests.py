@@ -14,14 +14,14 @@ from tracker.database import Node
 
 async def send_post_add(node):
     async with aiohttp.ClientSession() as session:
-        async with session.post('http://localhost:15000/root/add',
+        async with session.post('http://35.204.250.252:14100/root/add',
                                 json=json.dumps(node.to_json())) as resp:
             print(await resp.text())
 
 
 async def send_post_remove(node):
     async with aiohttp.ClientSession() as session:
-        async with session.post('http://localhost:15000/root/remove',
+        async with session.post('http://35.204.250.252:14100/root/remove',
                                 json=json.dumps(node.to_json())) as resp:
             print(await resp.text())
 
